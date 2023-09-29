@@ -1,10 +1,8 @@
 <?php
-/**
- * Created by Vlad Varlamov (laxity.ru) on 25.12.2019.
- */
-namespace Laxity7\Test;
 
-use Laxity7\DotEnv;
+namespace Laxity7\DotEnv\Test;
+
+use Laxity7\DotEnv\DotEnv;
 
 class DotEnvTest extends BaseTestCase
 {
@@ -16,8 +14,8 @@ class DotEnvTest extends BaseTestCase
         $env->load(self::ENV_FILE);
 
         foreach ($this->getValidData() as $key => $value) {
-            $this->assertSame($value, $env->get($key), 'Error parse key: ' . $key);
-            $this->assertSame($value, $_ENV[$key], 'Error parse key from $_ENV: ' . $key);
+            self::assertSame($value, $env->get($key), 'Error parse key: ' . $key);
+            self::assertSame($value, $_ENV[$key], 'Error parse key from $_ENV: ' . $key);
         }
     }
 
@@ -29,7 +27,7 @@ class DotEnvTest extends BaseTestCase
         $env = new DotEnv();
         $env->load(self::ENV_FILE);
 
-        $this->assertSame('bar', $env->get($key), 'Overwritten key:' . $key);
+        self::assertSame('bar', $env->get($key), 'Overwritten key:' . $key);
 
         $this->loadOrigin();
 
@@ -37,7 +35,21 @@ class DotEnvTest extends BaseTestCase
         $env = new DotEnv();
         $env->load(self::ENV_FILE, true);
 
-        $this->assertSame($this->getValidData()['BAR'], $env->get($key), 'Not overwritten key:' . $key);
+        self::assertSame($this->getValidData()['BAR'], $env->get($key), 'Not overwritten key:' . $key);
+    }
+
+    public function testGetAll(): void
+    {
+        $env = new DotEnv();
+        $env->load(self::ENV_FILE);
+        $envs = $env->getAll();
+
+        self::assertNotEmpty($envs);
+
+        foreach ($this->getValidData() as $key => $value) {
+            self::assertArrayHasKey($key, $envs);
+            self::assertSame($value, $envs[$key]);
+        }
     }
 
 }

@@ -2,19 +2,21 @@
 
 /**
  * @link      https://www.github.com/laxity7/dotenv
- * @copyright Copyright (c) 2018 Vlad Varlamov <work@laxity.ru>
+ * @copyright Copyright (c) 2023 Vlad Varlamov <vlad@varlamov.dev>
  * @license   https://opensource.org/licenses/MIT
  */
 
-namespace Laxity7;
+namespace Laxity7\DotEnv;
+
+use Error;
 
 /**
  * Env class is a helper class for ease of access to variables
  */
 class Env
 {
-    /** @var DotEnv Instance of DotEnv */
-    static protected $env;
+    /** @var DotEnv|null Instance of DotEnv */
+    static private ?DotEnv $env;
 
     /**
      * Load the initialized DotEnv class
@@ -29,18 +31,15 @@ class Env
     /**
      * Get the value of an environment variable
      *
-     * @param string                     $varName The variable name.
+     * @param string $varName The variable name.
      * @param string|bool|int|float|null $default Default value
      *
      * @return string|bool|int|float|null The value of the environment variable
      */
     public static function get(string $varName, $default = null)
     {
-        if (static::$env === null) {
-            $trace = debug_backtrace();
-            trigger_error('You must first initialize the DotEnv class. Use the method "load" before. Error in file ' . $trace[0]['file'] . ' line ' . $trace[0]['line'], E_USER_WARNING);
-
-            return $default;
+        if (!isset(static::$env)) {
+            throw new Error('Env class not initialized');
         }
 
         return static::$env->get($varName, $default);

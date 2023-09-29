@@ -1,7 +1,6 @@
 # Simply PHP dotenv
 
-Simply Dotenv parser .env files to make environment variables stored in them accessible 
-via getenv(), $_ENV and Env::get().
+Simply Dotenv parser .env files to make environment variables stored in them accessible via getenv(), $_ENV and Env::get().
 
 [![License](https://img.shields.io/github/license/laxity7/dotenv.svg)](https://github.com/laxity7/dotenv/blob/master/LICENSE)
 [![Latest Stable Version](https://img.shields.io/packagist/v/laxity7/dotenv.svg)](https://packagist.org/packages/laxity7/dotenv)
@@ -16,8 +15,6 @@ Install via composer
 ```shell
 composer require laxity7/dotenv
 ```
-
-Or you may add dependency manually in composer.json: `"laxity7/dotenv": "*"`
 
 ## How to use
 
@@ -38,14 +35,14 @@ Add your application configuration to a .env file in the root of your project or
 
 **Make sure the .env file is added to your .gitignore so it is not checked-in the code**.
 
-See all possible use cases in the file "tests/test.env". 
+See all possible use cases in the file "tests/test.env".
 
-Ok, after creating the .env file you can then load .env in your application with:
+Ok, after creating the .env file, you can then load .env in your application with:
 
 ```php
 // By default, existing variables will not be overwritten. Use the second parameter in load ()
 
-$dotenv = new Laxity7\Dotenv();
+$dotenv = new Laxity7\Dotenv\Dotenv();
 $dotenv->load($_SERVER['DOCUMENT ROOT'] . '/.env', false);
 // equivalent
 $dotenv->load();
@@ -56,7 +53,7 @@ $dotenv->load($_SERVER['DOCUMENT ROOT'] . '/.env', true);
 
 > There will be no error if the file .env does not exist, only global variables will be taken
 
-Now all of the defined variables are available in the $_ENV and $_SERVER super-globals.
+Now all the defined variables are available in the $_ENV and $_SERVER super-globals.
 
 > If your $_ENV array is mysteriously empty, but you still see the variables when calling 
 > getenv() or in your phpinfo(), check your 
@@ -69,7 +66,7 @@ You can also use the get method, which can return a default value (default `null
 
 ```php
 // in .env FOO=456
-$dotenv = new Laxity7\Dotenv();
+$dotenv = new Laxity7\Dotenv\Dotenv();
 $dotenv->load($_SERVER['DOCUMENT_ROOT'] . '/.env');
 
 $bar = $dotenv->get('BAR', 999); // $bar = 999
@@ -84,7 +81,7 @@ function env(string $name, $default = null) {
     static $env = null;
 
     if ($env === null) {
-        $env = new Laxity7\Dotenv();
+        $env = new Laxity7\Dotenv\Dotenv();
         $env->load($_SERVER['DOCUMENT ROOT'] . '/.env');
     }
 
@@ -95,11 +92,76 @@ function env(string $name, $default = null) {
 or use helper class Env
 
 ```php
-$dotenv = new Laxity7\Dotenv();
+$dotenv = new Laxity7\Dotenv\Dotenv();
 $dotenv->load($_SERVER['DOCUMENT ROOT'] . '/.env');
 Laxity7\Env::load($dotenv);
-// now you can use the get method
+// now you can use the get method anywhere
 $foo = Env::get('FOO', 'default');
 ```
 
-For even more simplicity, see this [gist](https://gist.github.com/laxity7/b253a62e02a6b7237fd4d907fce3fe0a).
+## How is this better than [symfony/dotenv](https://github.com/symfony/dotenv) package?
+
+Firstly, this package is natively **support boolean values**.
+
+For example,
+
+```dotenv 
+FOO=true
+BAR=false
+BAZ="false"
+```
+
+```php
+$foo = $_ENV['FOO']; // $foo === true
+$bar = $dotenv->get('BAR'); // $bar === false
+$baz = $dotenv->get('BAZ'); // $baz === 'false'
+```
+
+Secondly, this package is significantly faster than symfony/dotenv, with tests showing it to be **up to ~4 times quicker** in certain scenarios.
+This can be a major advantage for projects where performance is critical and every millisecond count.
+
+| #   | Laxity7   | Symfony   |
+|-----|-----------|-----------|
+| min | 0.0218 ms | 0.0773 ms |
+| max | 0.3831 ms | 0.9657 ms |
+| avg | 0.0238 ms | 0.0967 ms |
+
+You can run the tests yourself by running the following command:
+
+```shell
+composer benchmark
+composer bench
+```
+
+Thirdly, this package has built-in error smoothing, which allows you to **skip common formatting errors** (for example, spaces, lack of an equal sign and
+others) found in .env files. This makes it more user-friendly than symfony/dotenv, which requires you to write the .env file exclusively correctly.
+
+For example, this .env file will be loaded without errors in laxity7/dotenv
+
+```dotenv
+FOO =123
+BAR= 456
+BAZ
+FOOS=foo bar baz
+```
+
+But Symfony/dotenv will throw the following exceptions:
+
+```
+Whitespace characters are not supported after the variable name in ".env" at line 1.
+Whitespace are not supported before the value in ".env" at line 2.
+Missing = in the environment variable declaration in ".env" at line 3.
+A value containing spaces must be surrounded by quotes in ".env" at line 4
+```
+
+Fourth, this package provides inline comments in .env iles.
+
+```dotenv
+# This is a comment
+FOO=123 # This is also a comment
+BAR="123 #this's no comment"
+```
+
+In summary, this package is a faster and more user-friendly option for managing environment variables on your project compared to symfony/dotenv.
+While it may not have the same level of community support or features as its competitor, its focus on performance and ease of use may make it an attractive
+choice for many developers.

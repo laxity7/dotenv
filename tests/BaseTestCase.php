@@ -1,9 +1,6 @@
 <?php
-/**
- * Created by Vlad Varlamov (laxity.ru) on 02.02.2020.
- */
 
-namespace Laxity7\Test;
+namespace Laxity7\DotEnv\Test;
 
 use PHPUnit\Framework\TestCase;
 
@@ -22,14 +19,14 @@ abstract class BaseTestCase extends TestCase
     }
 
     /** @inheritDoc */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->originEnvs = getenv();
         $this->origin_Env = $_ENV;
     }
 
     /** @inheritDoc */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->loadOrigin();
     }
@@ -42,23 +39,29 @@ abstract class BaseTestCase extends TestCase
     protected function getValidData(): array
     {
         return [
-            'FOO_ENV'      => 'production',
-            'IS_FOO'       => true,
-            'BAR_DEBUG'    => 'false',
-            'FOO_HOST'     => 'localhost',
-            'FOO_NAME'     => 'my_base',
-            'FOO_USER'     => 'root',
+            'FOO_ENV' => 'production',
+            'IS_FOO' => true,
+            'BAR_DEBUG' => 'false',
+            'FOO_HOST' => 'localhost',
+            'FOO_NAME' => 'my_base',
+            'FOO_USER' => 'root',
             'FOO_PASSWORD' => '123',
-            'ROUND'        => 0.01,
-            'EPSILON'      => 0.000000001,
-            'FOO'          => 'BAR BAZ BAR',
-            'BAZ'          => 'BAR BAZ BAR',
-            'BAR'          => null,
-            'TEST'         => null,
-            'TEST_NULL'    => null,
-            'TEST_NULL_1'  => null,
-            'TEST_COMMENT' => '123 #it\'s no comment',
-            'bar_small'    => 123,
+            'ROUND' => 0.01,
+            'EPSILON' => 0.000000001,
+            'FOO' => 'BAR BAZ BAR',
+            'BAZ' => 'BAR BAZ BAR',
+            'BAR' => null,
+            'TEST' => null,
+            'TEST_NULL' => null,
+            'TEST_NULL_1' => null,
+            'TEST_COMMENT' => 123,
+            'TEST_COMMENT1' => '123',
+            'TEST_COMMENT2' => '123',
+            'TEST_COMMENT3' => '123 #it\'s no comment',
+            'TEST_COMMENT4' => '123',
+            'TEST_COMMENT5' => true,
+            'TEST_COMMENT6' => '123 foo"bar',
+            'bar_small' => 123,
         ];
     }
 
@@ -66,8 +69,8 @@ abstract class BaseTestCase extends TestCase
      * Get the private property at a class
      *
      * @param object|string $object
-     * @param string        $property
-     * @param bool          $isStatic
+     * @param string $property
+     * @param bool $isStatic
      *
      * @return mixed
      */
@@ -81,25 +84,22 @@ abstract class BaseTestCase extends TestCase
             $object = new $object();
         }
 
-        return $caller->bindTo($object, $object)
-                      ->__invoke($property);
+        return $caller->call($object, $property);
     }
 
     /**
      * Set the private property at a class
      *
      * @param object|string $object
-     * @param string        $property
-     * @param mixed         $value
-     * @param bool          $isStatic
-     *
-     * @return mixed
+     * @param string $property
+     * @param mixed $value
+     * @param bool $isStatic
      */
-    public function setPrivateProperty($object, string $property, $value, bool $isStatic = false)
+    public function setPrivateProperty($object, string $property, $value, bool $isStatic = false): void
     {
         $caller = function ($property) use ($value, $isStatic) {
             if ($isStatic) {
-                $this::${$property} = $value;
+                static::${$property} = $value;
             } else {
                 $this->$property = $value;
             }
@@ -109,11 +109,6 @@ abstract class BaseTestCase extends TestCase
             $object = new $object();
         }
 
-        return $caller->bindTo($object, $object)
-                      ->__invoke($property);
-    }
-
-    private function checkExceptionExpectations(Throwable $throwable): bool
-    {
+        $caller->call($object, $property);
     }
 }

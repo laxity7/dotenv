@@ -1,12 +1,12 @@
 <?php
 /**
- * Created by Vlad Varlamov (laxity.ru) on 25.12.2019.
+ * Created by Vlad Varlamov (varlamov.dev) on 25.12.2019.
  */
 
-namespace Laxity7\Test;
+namespace Laxity7\DotEnv\Test;
 
-use Laxity7\DotEnv;
-use Laxity7\Env;
+use Laxity7\DotEnv\DotEnv;
+use Laxity7\DotEnv\Env;
 
 class EnvTest extends BaseTestCase
 {
@@ -26,15 +26,13 @@ class EnvTest extends BaseTestCase
 
         Env::load($env);
 
-        $this->assertSame($this->getPrivateProperty(Env::class, 'env', true), $env, 'Error load env class');
+        self::assertSame($this->getPrivateProperty(Env::class, 'env', true), $env, 'Error load env class');
     }
 
-    /**
-     * @expectedException \PHPUnit\Framework\Error\Error
-     */
     public function testErrorGet(): void
     {
-        $this->expectExceptionMessageRegExp('/You must first initialize the DotEnv class\. Use the method "load" before.*/');
+        $this->expectException(\Error::class);
+        $this->expectExceptionMessage('Env class not initialized');
         Env::get('FOO');
     }
 
@@ -45,7 +43,7 @@ class EnvTest extends BaseTestCase
 
         Env::load($env);
 
-        $this->assertSame($this->getValidData()['BAR'], Env::get('BAR'), 'Not overwritten key:');
+        self::assertSame($this->getValidData()['BAR'], Env::get('BAR'), 'Not overwritten key:');
     }
 
 }
