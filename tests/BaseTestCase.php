@@ -61,6 +61,10 @@ abstract class BaseTestCase extends TestCase
             'TEST_COMMENT4' => '123',
             'TEST_COMMENT5' => true,
             'TEST_COMMENT6' => '123 foo"bar',
+            'TEST_COMMENT7' => 'foo bar',
+            'TEST_COMMENT8' => 'foo bar #it\'s no comment',
+            'TEST_COMMENT9' => 'foo bar #it"s no comment',
+            'TEST_COMMENT10' => 'foo bar #it\'s no comment',
             'bar_small' => 123,
         ];
     }

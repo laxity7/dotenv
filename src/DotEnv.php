@@ -71,20 +71,15 @@ final class DotEnv
         }
     }
 
-    private function removeComments(string $input): string
+    private function removeComments(string $string): string
     {
-        // Check if the entire string is enclosed in quotes or does not contain comments
-        if (strpos($input, '#') === false || preg_match('/^"([^"]*)"$/', $input, $matches)) {
-            return $input;
+        if (strpos($string, '#') === false) {
+            return $string;
         }
 
-        // Check if there are quotes before the # symbol
-        if (preg_match('/("[^"]*")\s?#/', $input, $matches)) {
-            return $matches[1];
-        }
+        $regexp = '/^((?:"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"|\'[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*\')|[^\'"#]*)\s?(#.*)$/m';
 
-        // If no quotes are found, remove everything after #
-        return preg_replace('/#.*$/', '', $input);
+        return preg_replace($regexp, '$1', $string);
     }
 
     /**
@@ -109,5 +104,4 @@ final class DotEnv
     {
         return $this->envs;
     }
-
 }

@@ -49,7 +49,7 @@
             "phpunit"
         ],
         "benchmark": [
-            "php vendor/bin/phpbench run tests/Benchmark/ --report=aggregate --progress=blinken"
+            "php vendor/bin/phpbench run tests/Benchmark/ --report=aggregate"
         ],
         "bench": [
             "php tests/Benchmark/bench.php"

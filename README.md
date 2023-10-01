@@ -43,12 +43,10 @@ Ok, after creating the .env file, you can then load .env in your application wit
 // By default, existing variables will not be overwritten. Use the second parameter in load ()
 
 $dotenv = new Laxity7\Dotenv\Dotenv();
-$dotenv->load($_SERVER['DOCUMENT ROOT'] . '/.env', false);
-// equivalent
-$dotenv->load();
+$dotenv->load(__DIR__ . '/.env', false);
 
 // To overwrite
-$dotenv->load($_SERVER['DOCUMENT ROOT'] . '/.env', true);
+$dotenv->load(__DIR__ . '/.env', true);
 ```
 
 > There will be no error if the file .env does not exist, only global variables will be taken
@@ -82,7 +80,7 @@ function env(string $name, $default = null) {
 
     if ($env === null) {
         $env = new Laxity7\Dotenv\Dotenv();
-        $env->load($_SERVER['DOCUMENT ROOT'] . '/.env');
+        $env->load(__DIR__ . '/.env');
     }
 
     return $env->get($name, $default);
@@ -93,7 +91,7 @@ or use helper class Env
 
 ```php
 $dotenv = new Laxity7\Dotenv\Dotenv();
-$dotenv->load($_SERVER['DOCUMENT ROOT'] . '/.env');
+$dotenv->load(__DIR__ . '/.env');
 Laxity7\Env::load($dotenv);
 // now you can use the get method anywhere
 $foo = Env::get('FOO', 'default');
@@ -159,7 +157,7 @@ Fourth, this package provides inline comments in .env iles.
 ```dotenv
 # This is a comment
 FOO=123 # This is also a comment
-BAR="123 #this's no comment"
+BAR="123 #this's no comment" # But this is a comment
 ```
 
 In summary, this package is a faster and more user-friendly option for managing environment variables on your project compared to symfony/dotenv.
