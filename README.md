@@ -37,16 +37,15 @@ Add your application configuration to a .env file in the root of your project or
 
 See all possible use cases in the file "tests/test.env".
 
-Ok, after creating the .env file, you can then load .env in your application with:
+Ok, after creating the .env file, you can then load .env in your application.
+
+Basic usage:
 
 ```php
-// By default, existing variables will not be overwritten. Use the second parameter in load ()
-
 $dotenv = new Laxity7\Dotenv\Dotenv();
-$dotenv->load(__DIR__ . '/.env', false);
-
-// To overwrite
-$dotenv->load(__DIR__ . '/.env', true);
+$dotenv->load(__DIR__ . '/.env');
+// By default, existing variables will not be overwritten. Use the second parameter in load ()
+$dotenv->load(__DIR__ . '/.env.local', true); // Optional. Variables from this file will not overwrite existing variables.
 ```
 
 > There will be no error if the file .env does not exist, only global variables will be taken
@@ -64,7 +63,7 @@ You can also use the get method, which can return a default value (default `null
 
 ```php
 // in .env FOO=456
-$dotenv = new Laxity7\Dotenv\Dotenv();
+$dotenv = new \Laxity7\Dotenv\Dotenv();
 $dotenv->load($_SERVER['DOCUMENT_ROOT'] . '/.env');
 
 $bar = $dotenv->get('BAR', 999); // $bar = 999
@@ -79,7 +78,7 @@ function env(string $name, $default = null) {
     static $env = null;
 
     if ($env === null) {
-        $env = new Laxity7\Dotenv\Dotenv();
+        $env = new \Laxity7\Dotenv\Dotenv();
         $env->load(__DIR__ . '/.env');
     }
 
@@ -90,11 +89,23 @@ function env(string $name, $default = null) {
 or use helper class Env
 
 ```php
-$dotenv = new Laxity7\Dotenv\Dotenv();
+$dotenv = new \Laxity7\Dotenv\Dotenv();
 $dotenv->load(__DIR__ . '/.env');
-Laxity7\Env::load($dotenv);
+\Laxity7\Dotenv\Env::load($dotenv);
 // now you can use the get method anywhere
 $foo = Env::get('FOO', 'default');
+```
+
+or combine both methods
+
+```php
+$dotenv = new \Laxity7\Dotenv\Dotenv();
+$dotenv->load(__DIR__ . '/.env');
+\Laxity7\Dotenv\Env::load($dotenv);
+
+function env(string $name, $default = null) {
+    return Env::get($name, $default);
+}
 ```
 
 ## How is this better than [symfony/dotenv](https://github.com/symfony/dotenv) package?
