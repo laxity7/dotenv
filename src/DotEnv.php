@@ -19,6 +19,7 @@ final class DotEnv
     /**
      * @var bool If `putenv()` should be used to define environment variables or not.
      * Beware that `putenv()` is not thread safe, that's why this setting defaults to false
+     * @deprecated
      */
     public bool $usePutEnv = false;
 
@@ -27,12 +28,13 @@ final class DotEnv
      *
      * @param string|null $dotEnvFilePath Path to a dotenv file. By default DOCUMENT_ROOT/.env
      * @param bool $overrideExistingVars Whether necessary to override existing environment variables
+     * @param bool $usePutEnv Whether necessary to use putenv() to define environment variables
      *
      * @return void The value of the environment variable
      */
-    public function load(string $dotEnvFilePath, bool $overrideExistingVars = false): void
+    public function load(string $dotEnvFilePath, bool $overrideExistingVars = false, bool $usePutEnv = false): void
     {
-        $this->envs = getenv() + $_ENV;
+        $this->envs = array_merge(getenv(), $_ENV, $this->envs);
 
         if (!file_exists($dotEnvFilePath)) {
             return;
@@ -64,11 +66,19 @@ final class DotEnv
                 $this->envs[$name] = $value;
                 $_ENV[$name] = $value;
 
-                if ($this->usePutEnv) {
+                if ($this->usePutEnv || $usePutEnv) {
                     putenv("$name=$value");
                 }
             }
         }
+    }
+
+    /**
+     * Clear all environment variables
+     */
+    public function clear(): void
+    {
+        $this->envs = [];
     }
 
     private function removeComments(string $string): string
