@@ -31,7 +31,7 @@ class EnvTest extends BaseTestCase
 
     public function testErrorGet(): void
     {
-        $this->expectException(\Error::class);
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Env class not initialized');
         Env::get('FOO');
     }
@@ -44,6 +44,24 @@ class EnvTest extends BaseTestCase
         Env::load($env);
 
         self::assertSame($this->getValidData()['BAR'], Env::get('BAR'), 'Not overwritten key:');
+    }
+
+    public function testHas(): void
+    {
+        $env = new DotEnv();
+        $env->load(self::ENV_FILE);
+
+        Env::load($env);
+
+        self::assertTrue(Env::has('FOO_ENV'));
+        self::assertFalse(Env::has('COMPLETELY_UNDEFINED_VAR'));
+    }
+
+    public function testHasNotInitialized(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Env class not initialized');
+        Env::has('FOO');
     }
 
 }

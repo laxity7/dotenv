@@ -52,4 +52,40 @@ class DotEnvTest extends BaseTestCase
         }
     }
 
+    public function testHas(): void
+    {
+        $env = new DotEnv();
+        $env->load(self::ENV_FILE);
+
+        self::assertTrue($env->has('FOO_ENV'));
+        self::assertTrue($env->has('BAR')); // BAR=null, but exists
+        self::assertFalse($env->has('COMPLETELY_UNDEFINED_VAR'));
+    }
+
+    public function testNonExistentFile(): void
+    {
+        $env = new DotEnv();
+        $env->load(__DIR__ . '/non_existent.env');
+
+        // Should not throw, should still have system envs
+        self::assertIsArray($env->getAll());
+    }
+
+    public function testUsePutEnv(): void
+    {
+        $env = new DotEnv();
+        $env->load(self::ENV_FILE, false, true);
+
+        self::assertSame('production', getenv('FOO_ENV'));
+    }
+
+    public function testUsePutEnvProperty(): void
+    {
+        $env = new DotEnv();
+        $env->usePutEnv = true;
+        $env->load(self::ENV_FILE);
+
+        self::assertSame('production', getenv('FOO_ENV'));
+    }
+
 }

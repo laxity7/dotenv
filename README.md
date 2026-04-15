@@ -42,7 +42,7 @@ Ok, after creating the .env file, you can then load .env in your application.
 Basic usage:
 
 ```php
-$dotenv = new Laxity7\Dotenv\Dotenv();
+$dotenv = new Laxity7\DotEnv\DotEnv();
 $dotenv->load(__DIR__ . '/.env');
 // By default, existing variables will not be overwritten. Use the second parameter in load ()
 $dotenv->load(__DIR__ . '/.env.local', true); // Optional. Variables from this file will not overwrite existing variables.
@@ -63,7 +63,7 @@ You can also use the get method, which can return a default value (default `null
 
 ```php
 // in .env FOO=456
-$dotenv = new \Laxity7\Dotenv\Dotenv();
+$dotenv = new \Laxity7\DotEnv\DotEnv();
 $dotenv->load($_SERVER['DOCUMENT_ROOT'] . '/.env');
 
 $bar = $dotenv->get('BAR', 999); // $bar = 999
@@ -78,7 +78,7 @@ function env(string $name, $default = null) {
     static $env = null;
 
     if ($env === null) {
-        $env = new \Laxity7\Dotenv\Dotenv();
+        $env = new \Laxity7\DotEnv\DotEnv();
         $env->load(__DIR__ . '/.env');
     }
 
@@ -89,9 +89,9 @@ function env(string $name, $default = null) {
 or use helper class Env
 
 ```php
-$dotenv = new \Laxity7\Dotenv\Dotenv();
+$dotenv = new \Laxity7\DotEnv\DotEnv();
 $dotenv->load(__DIR__ . '/.env');
-\Laxity7\Dotenv\Env::load($dotenv);
+\Laxity7\DotEnv\Env::load($dotenv);
 // now you can use the get method anywhere
 $foo = Env::get('FOO', 'default');
 ```
@@ -99,13 +99,60 @@ $foo = Env::get('FOO', 'default');
 or combine both methods
 
 ```php
-$dotenv = new \Laxity7\Dotenv\Dotenv();
+$dotenv = new \Laxity7\DotEnv\DotEnv();
 $dotenv->load(__DIR__ . '/.env');
-\Laxity7\Dotenv\Env::load($dotenv);
+\Laxity7\DotEnv\Env::load($dotenv);
 
 function env(string $name, $default = null) {
     return Env::get($name, $default);
 }
+```
+
+## Variable interpolation
+
+You can reference previously defined variables using `${VAR}` syntax:
+
+```dotenv
+APP_NAME=MyApp
+APP_ENV=production
+APP_TITLE="${APP_NAME} (${APP_ENV})"
+
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=mydb
+DATABASE_URL="mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}"
+```
+
+```php
+$dotenv->get('APP_TITLE'); // 'MyApp (production)'
+$dotenv->get('DATABASE_URL'); // 'mysql://localhost:3306/mydb'
+```
+
+> **Note:** Interpolation is **not** performed inside single-quoted values:
+> `FOO='${BAR}'` will remain the literal string `${BAR}`.
+> If a referenced variable is not defined, it will be replaced with an empty string.
+
+## Export prefix
+
+Lines prefixed with `export` are supported (common in shell-compatible .env files):
+
+```dotenv
+export APP_ENV=production
+export APP_DEBUG=false
+```
+
+The `export` keyword is simply stripped — the variables are loaded as usual.
+
+## Checking variable existence
+
+Use the `has()` method to check if a variable exists (including variables with `null` value):
+
+```php
+$dotenv->has('APP_ENV'); // true
+$dotenv->has('UNDEFINED'); // false
+
+// Also available via the Env helper:
+Env::has('APP_ENV'); // true
 ```
 
 ## How is this better than [symfony/dotenv](https://github.com/symfony/dotenv) package?

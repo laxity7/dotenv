@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @link      https://www.github.com/laxity7/dotenv
  * @copyright Copyright (c) 2023 Vlad Varlamov <vlad@varlamov.dev>
@@ -8,7 +10,7 @@
 
 namespace Laxity7\DotEnv;
 
-use Error;
+use RuntimeException;
 
 /**
  * Env class is a helper class for ease of access to variables
@@ -16,7 +18,7 @@ use Error;
 class Env
 {
     /** @var DotEnv|null Instance of DotEnv */
-    static private ?DotEnv $env;
+    private static ?DotEnv $env = null;
 
     /**
      * Load the initialized DotEnv class
@@ -25,7 +27,7 @@ class Env
      */
     public static function load(DotEnv $env): void
     {
-        static::$env = $env;
+        self::$env = $env;
     }
 
     /**
@@ -38,11 +40,26 @@ class Env
      */
     public static function get(string $varName, $default = null)
     {
-        if (!isset(static::$env)) {
-            throw new Error('Env class not initialized');
+        if (!isset(self::$env)) {
+            throw new RuntimeException('Env class not initialized');
         }
 
-        return static::$env->get($varName, $default);
+        return self::$env->get($varName, $default);
     }
 
+    /**
+     * Check if an environment variable exists
+     *
+     * @param string $name The variable name
+     *
+     * @return bool
+     */
+    public static function has(string $name): bool
+    {
+        if (!isset(self::$env)) {
+            throw new RuntimeException('Env class not initialized');
+        }
+
+        return self::$env->has($name);
+    }
 }

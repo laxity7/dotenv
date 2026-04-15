@@ -66,6 +66,16 @@ abstract class BaseTestCase extends TestCase
             'TEST_COMMENT9' => 'foo bar #it"s no comment',
             'TEST_COMMENT10' => 'foo bar #it\'s no comment',
             'bar_small' => 123,
+            'EXPORT_VAR' => 'exported_value',
+            'INTERP_BASE' => 'hello',
+            'INTERP_REF' => 'hello world',
+            'INTERP_NUM' => 'port_123',
+            'INTERP_MISSING' => 'fallback__end',
+            'INTERP_NESTED' => 'hello_production',
+            'FLOAT_DOT_PREFIX' => 0.5,
+            'EQUALS_VAL' => 'foo=bar=baz',
+            'LONG_VAL' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
+            'SPECIAL_CHARS' => 'hello@world.com:8080/path?q=1&r=2',
         ];
     }
 
